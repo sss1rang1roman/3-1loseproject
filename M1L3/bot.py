@@ -42,4 +42,26 @@ def check_links(message):
             except Exception as e:
                 print(f"Ошибка при бане пользователя: {e}")
 
+
+@bot.message_handler(content_types=['new_chat_members'])
+def make_some(message):
+   
+    for new_user in message.new_chat_members:
+        welcome_text = f" Добро пожаловать, {new_user.first_name}!\nРады видеть тебя в нашем чате!"
+        bot.send_message(message.chat.id, welcome_text)
+        bot.approve_chat_join_request(message.chat.id, new_user.id)
+
+@bot.message_handler(commands=['check_admin'])
+def check_admin_rights(message):
+    chat_id = message.chat.id
+    bot_user = bot.get_me()
+    try:
+        member = bot.get_chat_member(chat_id, bot_user.id)
+        if member.status == 'administrator':
+            bot.reply_to(message, "✅ Я имею права администратора!")
+        else:
+            bot.reply_to(message, "❌ У меня нет прав администратора!")
+    except Exception as e:
+        bot.reply_to(message, f"Ошибка: {e}")
+        
 bot.infinity_polling(none_stop=True)
